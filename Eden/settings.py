@@ -14,6 +14,12 @@ from datetime import timedelta
 from pathlib import Path
 import environ
 
+# Graphene is using an old version of a django util
+import django
+from django.utils.encoding import force_str
+
+django.utils.encoding.force_text = force_str
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
