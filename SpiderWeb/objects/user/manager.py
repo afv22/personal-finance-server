@@ -22,7 +22,7 @@ class UserManager(BaseUserManager):
         kwargs.setdefault("is_superuser", False)
         self._create_user(username, email, password, kwargs)
 
-    def create_superuser(self, username, email, password):
+    def create_superuser(self, username, password):
         """
         Create and return a `User` with superuser (admin) permissions.
         """
@@ -31,7 +31,7 @@ class UserManager(BaseUserManager):
         if username is None:
             raise TypeError("Superusers must have an username.")
 
-        user = self.create_user(username, email, password)
+        user = self.create_user(username, "", password)
         user.is_superuser = True
         user.is_staff = True
         user.save(using=self._db)
