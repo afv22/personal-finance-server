@@ -6,7 +6,13 @@ from django.contrib.auth.models import (
 from django.db import models
 from .manager import UserManager
 from SpiderWeb.helpers import fetch_model, Name
-from .utils.taxRate import calculateTieredTaxes, taxBrackets
+from .utils.taxRate import (
+    calculateTieredTaxes,
+    MEDICARE_RATE,
+    SOCIAL_SECURITY_RATE,
+    TAX_BRACKETS,
+)
+from .utils.states import STATES
 
 
 class UserModel(AbstractBaseUser, PermissionsMixin):
@@ -16,7 +22,7 @@ class UserModel(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    state = models.CharField(max_length=255, default="")
+    state = models.CharField(max_length=255, choices=STATES, default="")
 
     USERNAME_FIELD = "username"
     EMAIL_FIELD = "email"
@@ -34,13 +40,16 @@ class UserModel(AbstractBaseUser, PermissionsMixin):
                 fetch_model(Name.EDGE.value).objects.filter(isTaxable=True),
             )
         )
-        federalTaxes = calculateTieredTaxes(taxableValue, taxBrackets["federal"])
-        stateTaxes = (
-            calculateTieredTaxes(taxableValue, taxBrackets[self.state.lower()])
-            if self.state.lower()
-            else 0
-        )
-        medicareTaxes = taxableValue * 0.0145
-        socSecTaxes = taxableValue * 0.062
+        federalTaxes = calculateTieredTaxes(taxableValue, "federal")
+        if self.state.lower() in TAX_BRACKETS:
+            stateTaxes = (
+                calculateTieredTaxes(taxableValue, self.state.lower())
+                if self.state.lower()
+                else 0
+            )
+        else:
+            stateTaxes = 0
+        medicareTaxes = taxableValue * MEDICARE_RATE
+        socSecTaxes = taxableValue * SOCIAL_SECURITY_RATE
         totalTaxes = sum([federalTaxes, stateTaxes, medicareTaxes, socSecTaxes])
         return totalTaxes / taxableValue

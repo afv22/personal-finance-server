@@ -19,15 +19,24 @@ class EdgeModel(models.Model):
         return fetch_model(Name.NODE.value).objects.get(pk=id).name
 
     def __str__(self) -> str:
-        return f"{self._fetchNodeName(self.sourceId)} - {self._fetchNodeName(self.targetId)}"
+        return "Fuck"
+        # return f"{self._fetchNodeName(self.sourceId)} - {self._fetchNodeName(self.targetId)}"
 
     def calculateGrossValue(self) -> float:
-        sourceNode = fetch_model(Name.NODE.value).objects.get(pk=self.sourceId)
+        sourceAccount = (
+            fetch_model(Name.ACCOUNT.value).objects.filter(pk=self.sourceId).first()
+        )
+        sourceIncome = (
+            fetch_model(Name.INCOME.value).objects.filter(pk=self.sourceId).first()
+        )
+
+        source = sourceAccount if sourceAccount else sourceIncome
+
         if self.sourcePercentage:
-            return sourceNode.calculateGrossValue() * self.sourcePercentage / 100
+            return source.calculateGrossValue() * self.sourcePercentage / 100
         elif self.sourceAmount:
             return self.sourceAmount
-        return sourceNode.calculateRemainingBalanceForEdge(self)
+        return source.calculateRemainingBalance(self)
 
     def calculateTaxes(self) -> float:
         if not self.isTaxable:

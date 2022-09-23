@@ -1,4 +1,8 @@
-taxBrackets = {
+MEDICARE_RATE = 0.0145
+
+SOCIAL_SECURITY_RATE = 0.062
+
+TAX_BRACKETS = {
     "federal": [
         (0, 0),
         (0.1, 9950),
@@ -22,7 +26,8 @@ taxBrackets = {
 }
 
 
-def calculateTieredTaxes(taxableValue, taxBrackets) -> float:
+def calculateTieredTaxes(taxableValue, state) -> float:
+    taxBrackets = TAX_BRACKETS[state]
     return sum(
         [
             rate * max(0, min(cap, taxableValue) - taxBrackets[i - 1][1])

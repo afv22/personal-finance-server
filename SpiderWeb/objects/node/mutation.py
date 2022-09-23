@@ -1,5 +1,4 @@
 import graphene
-from graphene_django import DjangoObjectType
 from SpiderWeb.helpers import generateID
 from .model import NodeModel
 from .type import NodeType
