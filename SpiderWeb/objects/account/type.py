@@ -1,3 +1,4 @@
+from urllib import request
 import graphene
 from graphene_django import DjangoObjectType
 from .model import AccountModel
@@ -8,12 +9,12 @@ class AccountType(DjangoObjectType):
         model = AccountModel
         fields = "__all__"
 
-    gross_value = graphene.Float(required=True)
+    value = graphene.Float(required=True)
 
-    def resolve_gross_value(self, info):
-        return AccountModel.objects.get(pk=self.id).calculateGrossValue()
+    def resolve_value(self, info):
+        return self.getValue()
 
     net_value = graphene.Float(required=True)
 
     def resolve_net_value(self, info):
-        return AccountModel.objects.get(pk=self.id).calculateNetValue()
+        return self.getNetValue()

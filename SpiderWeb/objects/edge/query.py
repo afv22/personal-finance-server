@@ -5,18 +5,10 @@ from .model import EdgeModel
 
 class EdgeQuery(graphene.ObjectType):
 
-    user_edges = graphene.List(EdgeType)
+    edges = graphene.List(EdgeType)
 
-    def resolve_user_edges(self, info, **kwargs):
+    def resolve_edges(self, info):
         return EdgeModel.objects.filter(user_id=info.context.user.id)
-
-    edges = graphene.List(EdgeType, edge_ids=graphene.List(graphene.ID))
-
-    def resolve_edges(self, info, edge_ids):
-        return [
-            EdgeModel.objects.get(pk=edge_id, user_id=info.context.user.id)
-            for edge_id in edge_ids
-        ]
 
     edge = graphene.Field(EdgeType, edge_id=graphene.ID())
 

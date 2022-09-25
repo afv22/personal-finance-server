@@ -8,12 +8,7 @@ class NodeType(DjangoObjectType):
         model = NodeModel
         fields = "__all__"
 
-    gross_value = graphene.Float(required=True, node_id=graphene.ID())
+    value = graphene.Float(node_id=graphene.ID())
 
-    def resolve_gross_value(self, info):
-        return NodeModel.objects.get(pk=self.id).calculateGrossValue()
-
-    net_value = graphene.Float(required=True, node_id=graphene.ID())
-
-    def resolve_net_value(self, info):
-        return NodeModel.objects.get(pk=self.id).calculateNetValue()
+    def resolve_value(self, info):
+        return self.getValue()

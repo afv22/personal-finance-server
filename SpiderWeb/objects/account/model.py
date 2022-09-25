@@ -3,18 +3,15 @@ from SpiderWeb.objects.node.model import NodeModel
 
 
 class AccountModel(NodeModel):
-    def calculateGrossValue(self) -> float:
-        return self.initialValue + sum(
-            [edge.calculateNetValue() for edge in self.getIncomingEdges()]
-        )
+    def getValue(self):
+        return sum([edge.calculateNetValue() for edge in self.getIncomingEdges()])
 
-    def calculateNetValue(self) -> float:
-        outgoingValue = sum(
+    def getNetValue(self):
+        return self.getValue() - sum(
             [edge.calculateGrossValue() for edge in self.getOutgoingEdges()]
         )
-        return self.calculateGrossValue() - outgoingValue
 
-    def calculateRemainingBalance(self, remaining_edge):
+    def getRemainingBalance(self, remaining_edge):
         outgoingValue = sum(
             [
                 edge.calculateGrossValue()
@@ -22,13 +19,13 @@ class AccountModel(NodeModel):
                 if edge.id != remaining_edge.id
             ]
         )
-        return self.calculateGrossValue() - outgoingValue
+        return self.getValue() - outgoingValue
 
     def getIncomingEdges(self):
-        return fetch_model(Name.EDGE.value).objects.filter(targetId=self.id)
+        return fetch_model(Name.EDGE).objects.filter(targetId=self.id)
 
     def getOutgoingEdges(self):
-        return fetch_model(Name.EDGE.value).objects.filter(sourceId=self.id)
+        return fetch_model(Name.EDGE).objects.filter(sourceId=self.id)
 
     def getEdges(self):
         return self.getIncomingEdges() | self.getOutgoingEdges()

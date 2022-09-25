@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
-from abc import abstractmethod
+from SpiderWeb.helpers import fetch_model, Name
+
+subclasses = [Name.ACCOUNT, Name.INCOME]
 
 
 class NodeModel(models.Model):
@@ -11,10 +13,23 @@ class NodeModel(models.Model):
     def __str__(self) -> str:
         return f"{self.user.__str__()}: {self.name}"
 
-    @abstractmethod
-    def calculateGrossValue(self):
-        pass
+    def __getChild(self) -> models.Model:
+        child = list(
+            filter(
+                lambda obj: obj,
+                map(
+                    lambda model: fetch_model(model).objects.filter(pk=self.id).first(),
+                    subclasses,
+                ),
+            )
+        )[0]
+        return child
 
-    @abstractmethod
-    def calculateRemainingBalance(self):
-        pass
+    def getRemainingBalance(self, remaining_edge) -> float:
+        return self.__getChild().getRemainingBalance(remaining_edge)
+
+    def getValue(self) -> float:
+        return self.__getChild().getValue()
+
+    def getEdges(self):
+        return self.__getChild().getEdges()

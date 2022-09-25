@@ -33,11 +33,11 @@ class UserModel(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.username}"
 
-    def calculateRealTaxRate(self) -> float:
+    def getTaxRate(self) -> float:
         taxableValue = sum(
             map(
                 lambda edge: edge.calculateGrossValue(),
-                fetch_model(Name.EDGE.value).objects.filter(isTaxable=True),
+                fetch_model(Name.EDGE).objects.filter(isTaxable=True),
             )
         )
         federalTaxes = calculateTieredTaxes(taxableValue, "federal")

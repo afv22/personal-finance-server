@@ -8,7 +8,7 @@ class IncomeType(DjangoObjectType):
         model = IncomeModel
         fields = "__all__"
 
-    value = graphene.Float(required=True)
+    # value = graphene.Float(required=True)
 
-    def resolve_value(self, info):
-        return IncomeModel.objects.get(pk=self.id).value
+    # def resolve_value(self, info):
+    #     return self.payoutValue

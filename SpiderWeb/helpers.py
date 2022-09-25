@@ -13,7 +13,7 @@ class Name(Enum):
 
 
 def fetch_model(model_name: Name) -> models.Model:
-    return apps.get_model(app_label="SpiderWeb", model_name=model_name)
+    return apps.get_model(app_label="SpiderWeb", model_name=model_name.value)
 
 
 def generateID():

@@ -4,18 +4,12 @@ from ..node.model import NodeModel
 
 
 class IncomeModel(NodeModel):
-    value = models.FloatField(default=1.0)
+    value = models.FloatField(default=0)
 
-    def calculateGrossValue(self) -> float:
+    def getValue(self):
         return self.value
 
-    def calculateNetValue(self) -> float:
-        outgoingValue = self.value + sum(
-            [edge.calculateGrossValue() for edge in self.getOutgoingEdges()]
-        )
-        return self.calculateGrossValue() - outgoingValue
-
-    def calculateRemainingBalance(self, remaining_edge):
+    def getRemainingBalance(self, remaining_edge):
         outgoingValue = sum(
             [
                 edge.calculateGrossValue()
@@ -23,10 +17,10 @@ class IncomeModel(NodeModel):
                 if edge.id != remaining_edge.id
             ]
         )
-        return self.calculateGrossValue() - outgoingValue
+        return self.getValue() - outgoingValue
 
     def getOutgoingEdges(self):
-        return fetch_model(Name.EDGE.value).objects.filter(sourceId=self.id)
+        return fetch_model(Name.EDGE).objects.filter(sourceId=self.id)
 
     def getEdges(self):
         return self.getOutgoingEdges()

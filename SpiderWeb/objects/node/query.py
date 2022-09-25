@@ -4,21 +4,14 @@ from .mutation import NodeType
 
 
 class NodeQuery(graphene.ObjectType):
+    pass
 
-    user_nodes = graphene.List(NodeType)
+    # nodes = graphene.List(NodeType)
 
-    def resolve_user_nodes(self, info, **kwargs):
-        return NodeModel.objects.filter(user_id=info.context.user.id)
+    # def resolve_nodes(self, info):
+    #     return NodeModel.objects.filter(user_id=info.context.user.id)
 
-    nodes = graphene.List(NodeType, node_ids=graphene.List(graphene.ID))
+    # node = graphene.Field(NodeType, node_id=graphene.ID())
 
-    def resolve_nodes(self, info, node_ids):
-        return [
-            NodeModel.objects.get(pk=node_id, user_id=info.context.user.id)
-            for node_id in node_ids
-        ]
-
-    node = graphene.Field(NodeType, node_id=graphene.ID())
-
-    def resolve_node(self, info, node_id):
-        return NodeModel.objects.get(pk=node_id, user_id=info.context.user.id)
+    # def resolve_node(self, info, node_id):
+    #     return NodeModel.objects.get(pk=node_id, user_id=info.context.user.id)

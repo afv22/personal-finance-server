@@ -15,33 +15,22 @@ class EdgeModel(models.Model):
     sourceAmount = models.FloatField(default=0)
     sourceRemainingBalance = models.BooleanField(default=False)
 
-    def _fetchNodeName(self, id):
-        return fetch_model(Name.NODE.value).objects.get(pk=id).name
-
     def __str__(self) -> str:
-        return "Fuck"
-        # return f"{self._fetchNodeName(self.sourceId)} - {self._fetchNodeName(self.targetId)}"
+        node_obj = fetch_model(Name.NODE).objects
+        return f"{self.user.username}: {node_obj.get(pk=self.sourceId).name} - {node_obj.get(pk=self.targetId).name}"
 
     def calculateGrossValue(self) -> float:
-        sourceAccount = (
-            fetch_model(Name.ACCOUNT.value).objects.filter(pk=self.sourceId).first()
-        )
-        sourceIncome = (
-            fetch_model(Name.INCOME.value).objects.filter(pk=self.sourceId).first()
-        )
-
-        source = sourceAccount if sourceAccount else sourceIncome
-
+        source = fetch_model(Name.NODE).objects.get(pk=self.sourceId)
         if self.sourcePercentage:
-            return source.calculateGrossValue() * self.sourcePercentage / 100
+            return source.getValue() * self.sourcePercentage / 100
         elif self.sourceAmount:
             return self.sourceAmount
-        return source.calculateRemainingBalance(self)
+        return source.getRemainingBalance(self)
 
     def calculateTaxes(self) -> float:
-        if not self.isTaxable:
-            return 0
-        return self.calculateGrossValue() * self.user.calculateRealTaxRate()
+        return (
+            self.calculateGrossValue() * self.user.getTaxRate() if self.isTaxable else 0
+        )
 
     def calculateNetValue(self) -> float:
         return self.calculateGrossValue() - self.calculateTaxes()
